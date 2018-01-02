@@ -13,7 +13,7 @@ const express = require('express'),
 
 // GET download-and-encode
 router.get('/', (req, res, next) => { // GET download-and-encode
-	if (!fs.existsSync(`./${downloadFile}`)) { // if there is no transcoded download yet
+	if (!fs.existsSync(`./${newFile}`)) { // if there is no transcoded download yet
 		progress(request(videoUrl), {}) // download file
 			.on('progress', (state) => { // on progress return state
 				res.render('download', { state: state.percent * 100 }, (err, html) => { // render the state on download.jade
@@ -77,8 +77,6 @@ router.get('/', (req, res, next) => { // GET download-and-encode
 								res.write(html);
 								return res.end();
 							});
-							console.error('Whoopsie daisies; please check if you 1) downloaded FFMPEG ' +
-								'to your computer and 2) if the FFMPEG_PATH is set accordingly.');
 						})
 						.run();
 				});

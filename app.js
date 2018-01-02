@@ -3,7 +3,7 @@ const express = require('express'),
 	logger = require('morgan'),
 	cookieParser = require('cookie-parser'),
 	bodyParser = require('body-parser'),
-	port = 3000;
+	port = 5000;
 
 const index = require('./routes/index'),
 	downloadAndEncode = require('./routes/download-and-encode');
