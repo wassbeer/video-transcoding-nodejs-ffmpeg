@@ -3,7 +3,7 @@ const express = require('express'),
 
 /* GET home page. */
 router.get('/', (req, res, next) => {
-	res.redirect('/download-and-encode')
+	res.send("GET '/download-and-encode' working");
 });
 
 module.exports = router;
