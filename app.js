@@ -1,6 +1,5 @@
 const express = require('express'),
 	path = require('path'),
-	favicon = require('serve-favicon'),
 	logger = require('morgan'),
 	cookieParser = require('cookie-parser'),
 	bodyParser = require('body-parser'),
@@ -8,9 +7,6 @@ const express = require('express'),
 
 const index = require('./routes/index'),
 	downloadAndEncode = require('./routes/download-and-encode');
-// var download = require('./routes/download');
-// var transcode = require('./routes/transcode');
-// var video = require('./routes/video')
 
 const app = express();
 
