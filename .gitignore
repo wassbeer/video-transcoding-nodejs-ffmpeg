@@ -51,6 +51,11 @@ typings/
 # Output of 'npm pack'
 *.tgz
 
+# Video
+*.mkv
+*.mp4
+*.webm
+
 # Yarn Integrity file
 .yarn-integrity
 
