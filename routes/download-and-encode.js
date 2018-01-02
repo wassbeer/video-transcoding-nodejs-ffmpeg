@@ -7,21 +7,16 @@ const express = require('express'),
 	fs = require('fs'),
 
 	// files
-	videoUrl = 'http://mirrors.standaloneinstaller.com/video-sample/small.mkv',
+	videoUrl = 'https://s3.eu-central-1.amazonaws.com/flipbase-coding-challenge/elysium.mkv',
 	downloadFile = 'video.mkv',
 	newFile = 'video.mp4';
 
 // GET download-and-encode
-router.get('/', (req, res, next) => {
-	// if there is no transcoded download yet
-	if (!fs.existsSync(`./${downloadFile}`)) {
-		// download file
-		progress(request(videoUrl), {})
-			// on progress return state
-			.on('progress', (state) => {
-				// render the state on download.jade
-				console.log('Download in progress: ' + state.percent * 100 + '%');
-				res.render('download', { state: state.percent * 100 }, (err, html) => {
+router.get('/', (req, res, next) => { // GET download-and-encode
+	if (!fs.existsSync(`./${downloadFile}`)) { // if there is no transcoded download yet
+		progress(request(videoUrl), {}) // download file
+			.on('progress', (state) => { // on progress return state
+				res.render('download', { state: state.percent * 100 }, (err, html) => { // render the state on download.jade
 					if (err) {
 						console.log(err);
 					}
@@ -32,16 +27,13 @@ router.get('/', (req, res, next) => {
 				console.log(err);
 			})
 			.on('end', () => {
-				console.log('download done!');
-				// notify user on download completion
-				res.render('download', { state: 'download completed' }, (err, html) => {
+				res.render('download', { state: 'download completed' }, (err, html) => { // notify user on download completion
 					if (err) {
 						console.log(err);
 					}
 					res.write(html);
 				});
-				// read and transcode the downloaded file
-				fs.readFile(`${downloadFile}`, (err, data) => {
+				fs.readFile(`${downloadFile}`, (err, data) => { // read and transcode the downloaded file
 					if (err) {
 						throw err;
 					}
@@ -52,8 +44,7 @@ router.get('/', (req, res, next) => {
 
 					ffmpeg.setFfmpegPath(process.env.FFMPEG_PATH);
 
-					// Transcoding MKV to MP4
-					ffmpeg(`./${downloadFile}`)
+					ffmpeg(`./${downloadFile}`) // Transcoding MKV to MP4
 						.outputOptions([
 							'-acodec libmp3lame',
 							'-vcodec libx264',
@@ -67,10 +58,8 @@ router.get('/', (req, res, next) => {
 						.on('start', () => {
 							console.log('Relax! FFMPEG is doing all the hard work');
 						})
-						// render progress of transcoding
-						.on('progress', (progress) => {
-							console.log('Transcoding progress: ' + progress.timemark);
-							res.render('transcode', { state: progress.timemark }, (err, html) => {
+						.on('progress', (progress) => { // on progress return progress
+							res.render('transcode', { state: progress.timemark }, (err, html) => { // render progress of transcoding
 								if (err) {
 									console.log(err);
 								}
@@ -81,15 +70,13 @@ router.get('/', (req, res, next) => {
 							console.error(err);
 						})
 						.on('end', () => {
-							// render the completed state of transcoding
-							res.render('transcode', { state: 'completed, please refresh the page' }, (err, html) => {
+							res.render('transcode', { state: 'completed, please refresh the page' }, (err, html) => { // render the completed state of transcoding
 								if (err) {
 									console.log(err);
 								}
 								res.write(html);
+								return res.end();
 							});
-							res.end();
-							// res.redirect('/');
 							console.error('Whoopsie daisies; please check if you 1) downloaded FFMPEG ' +
 								'to your computer and 2) if the FFMPEG_PATH is set accordingly.');
 						})
@@ -98,8 +85,6 @@ router.get('/', (req, res, next) => {
 			})
 			.pipe(fs.createWriteStream(`${downloadFile}`));
 	} else {
-		console.log('about to render video');
-		// Rendering video
 		let path = `./${newFile}`,
 			stat = fs.statSync(path),
 			fileSize = stat.size,
@@ -124,7 +109,7 @@ router.get('/', (req, res, next) => {
 				'Content-Type': 'video/mp4'
 			};
 			res.writeHead(200, head);
-			fs.createReadStream(path).pipe(res);
+			fs.createReadStream(path).pipe(res); // Streaming video
 		}
 	}
 });
