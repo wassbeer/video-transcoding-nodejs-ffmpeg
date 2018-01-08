@@ -4,8 +4,9 @@ const express = require('express'),
 	fs = require('fs'),
 	newFile = 'video.mp4';
 
+// download-and-encode route
 router.get('/', (req, res, next) => {
-	if (fs.existsSync(`./${newFile}`)) { // if there is no transcoded download yet
+	if (fs.existsSync(`./${newFile}`)) { // if there is a transcoded download
 		let path = `./${newFile}`,
 			stat = fs.statSync(path),
 			fileSize = stat.size,
@@ -32,9 +33,13 @@ router.get('/', (req, res, next) => {
 			res.writeHead(200, head);
 			fs.createReadStream(path).pipe(res); // Streaming video
 		}
-	} else {
+	} else { // if there is no transcoded download yet
 		res.render('homepage');
 	}
 });
 
-module.exports = router;
+// exports
+module.exports = {
+	router: router,
+	newFile: newFile
+};

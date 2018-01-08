@@ -1,3 +1,4 @@
+// dependencies
 const express = require('express'),
 	path = require('path'),
 	logger = require('morgan'),
@@ -7,9 +8,10 @@ const express = require('express'),
 	progress = require('request-progress'),
 	ffmpeg = require('fluent-ffmpeg'),
 	fs = require('fs'),
-	port = 5000;
+	port = 5000,
 
-let app = express(),
+	// app & server
+	app = express(),
 	http = require('http'),
 	server = http.createServer(app),
 	io = require('socket.io').listen(server), // creates a new socket.io instance attached to the http server.
@@ -17,21 +19,24 @@ let app = express(),
 	// files
 	videoUrl = 'https://s3.eu-central-1.amazonaws.com/flipbase-coding-challenge/elysium.mkv',
 	downloadFile = 'video.mkv',
-	newFile = 'video.mp4';
+	newFile = require('./routes/download-and-encode').newFile,
 
-const index = require('./routes/index'),
-	downloadAndEncode = require('./routes/download-and-encode');
+	// importing router
+	index = require('./routes/index'),
+	downloadAndEncode = require('./routes/download-and-encode').router;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
+// middleware setup
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// routes configuration
 app.use('/', index);
 app.use('/download-and-encode', downloadAndEncode);
 
@@ -44,25 +49,24 @@ app.use((req, res, next) => {
 
 // error handler
 app.use((err, req, res, next) => {
-	// set locals, only providing error in development
 	res.locals.message = err.message;
 	res.locals.error = req.app.get('env') === 'development' ? err : {};
-	// render the error page
 	res.status(err.status || 500);
 	res.render('error');
 });
 
+// socket.io
 io.on('connection', (socket) => { // The io.on event handler handles connection, disconnection, etc., events in it, using the socket object.
 	console.log('Connected on server side: ' + socket.id);
 	progress(request(videoUrl), {}) // download file
 		.on('progress', (state) => { // on progress return state
-			socket.emit('message', JSON.stringify({ title: 'Download in progress', progress: state.percent * 100 + "%" }));
+			socket.emit('message', JSON.stringify({ title: 'Download in progress', progress: state.percent * 100 + '%' }));
 		})
 		.on('error', (err) => {
 			console.log(err);
 		})
 		.on('end', () => {
-			socket.emit('message', JSON.stringify({ title: 'Download completed', progress: "100%" }));
+			socket.emit('message', JSON.stringify({ title: 'Download completed', progress: '100%' }));
 			fs.readFile(`${downloadFile}`, (err, data) => { // read and transcode the downloaded file
 				if (err) {
 					throw err;
@@ -95,7 +99,7 @@ io.on('connection', (socket) => { // The io.on event handler handles connection,
 						console.error(err);
 					})
 					.on('end', () => {
-						socket.emit('message', JSON.stringify({ title: 'Encoding completed', progress: "100%" }));
+						socket.emit('message', JSON.stringify({ title: 'Encoding completed', progress: '100%' }));
 					})
 					.run();
 			});
@@ -103,14 +107,16 @@ io.on('connection', (socket) => { // The io.on event handler handles connection,
 		.pipe(fs.createWriteStream(`${downloadFile}`));
 	socket.on('disconnect', () => {
 		console.log('Socket disconnected');
-	})
+	});
 });
 
+// server configuration
 server.listen(port, (err) => {
-	if (err) { console.log(err) };
+	if (err) { console.log(err); }
 	console.log('server listening on port ' + port);
 });
 
-module.exports = {  
-	newFile: newFile 
-}
+// exports
+module.exports = {
+	newFile: newFile
+};
