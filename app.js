@@ -12,10 +12,10 @@ const express = require('express'),
 let app = express(),
 	http = require('http'),
 	server = http.createServer(app),
-	io = require('socket.io').listen(server); // creates a new socket.io instance attached to the http server.
+	io = require('socket.io').listen(server), // creates a new socket.io instance attached to the http server.
 
-// files
-videoUrl = 'http://mirrors.standaloneinstaller.com/video-sample/TRA3106.mkv',
+	// files
+	videoUrl = 'https://s3.eu-central-1.amazonaws.com/flipbase-coding-challenge/elysium.mkv',
 	downloadFile = 'video.mkv',
 	newFile = 'video.mp4';
 
@@ -89,7 +89,7 @@ io.on('connection', (socket) => { // The io.on event handler handles connection,
 						console.log('Relax! FFMPEG is doing all the hard work');
 					})
 					.on('progress', (progress) => { // on progress return progress
-						socket.emit('message', JSON.stringify({ title: 'Encoding file', progress: progress.timemark + 'hh:mm:ss' }));
+						socket.emit('message', JSON.stringify({ title: 'Encoding file', progress: progress.percent + '%' }));
 					})
 					.on('error', (err) => {
 						console.error(err);
@@ -101,17 +101,16 @@ io.on('connection', (socket) => { // The io.on event handler handles connection,
 			});
 		})
 		.pipe(fs.createWriteStream(`${downloadFile}`));
-	// } else {
-	// }
 	socket.on('disconnect', () => {
 		console.log('Socket disconnected');
 	})
 });
-
 
 server.listen(port, (err) => {
 	if (err) { console.log(err) };
 	console.log('server listening on port ' + port);
 });
 
-module.exports = { app: app, newFile: newFile }
+module.exports = {  
+	newFile: newFile 
+}

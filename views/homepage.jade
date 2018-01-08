@@ -11,6 +11,10 @@ block content
 		let JSONdata = JSON.parse(data);
 		console.log("message and data" + data)
 		$('#progress').html(() => {
+		if(JSONdata.title === 'Encoding completed'){
+		console.log('JSONdata.title: ' + JSONdata.title);
+		setTimeout(()=>{window.location.replace('http://localhost:5000/download-and-encode')}, 3000);
+		}
 		return '<h1>' + JSONdata.title + '</h1>' + '\n' + '<p>' + JSONdata.progress + '</p>' 
 		});
 		});
