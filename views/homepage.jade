@@ -1,0 +1,17 @@
+extends layout
+block content
+	script(type="text/javascript" src='/socket.io/socket.io.js')
+	script(type='text/javascript', src='https://code.jquery.com/jquery-3.2.1.js')
+	#progress
+	script.
+		let socket = io();
+		socket.on('connect', function(){
+		console.log('socket connected on client side')});
+		socket.on('message', function(data){
+		let JSONdata = JSON.parse(data);
+		console.log("message and data" + data)
+		$('#progress').html(() => {
+		return '<h1>' + JSONdata.title + '</h1>' + '\n' + '<p>' + JSONdata.progress + '</p>' 
+		});
+		});
+		socket.on('disconnect', function(){});
