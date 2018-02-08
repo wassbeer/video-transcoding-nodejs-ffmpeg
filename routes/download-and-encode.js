@@ -25,11 +25,8 @@ router.get('/', (req, res, next) => {
 			};
 		res.writeHead(200, head);
 		fs.createReadStream(path).pipe(res); // Streaming video
-
-		// streamVideo();
 	} else { // if there is no transcoded download yet
 		res.render('homepage');
-		// downloadAndTranscode();
 		progress(request(videoUrl), {}) // download file
 			.on('progress', (state) => { // on progress return state
 				socket.emit('message', JSON.stringify({ title: 'Download in progress', progress: state.percent * 100 + '%' }));
@@ -82,4 +79,5 @@ router.get('/', (req, res, next) => {
 
 // exports
 module.exports = {
-	router: router};
+	router: router
+};
