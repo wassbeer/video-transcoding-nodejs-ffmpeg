@@ -8,9 +8,9 @@ exports.io = () => {
 exports.initialize = (server) => {
 	io = sio(server);
 	io.on('connection', (socket) => {
-		console.log('socket connected')
+		console.log('socket connected');
 		io.on('disconnect', () => {
-			console.log('socket disconnected')
+			console.log('socket disconnected');
 		})
 	});
 };
