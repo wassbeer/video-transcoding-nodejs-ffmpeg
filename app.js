@@ -16,8 +16,10 @@ const express = require('express'),
 	server = http.createServer(app),
 	io = require('socket.io').listen(server), // creates a new socket.io instance attached to the http server.
 
+// https://s3.eu-central-1.amazonaws.com/flipbase-coding-challenge/elysium.mkv
+
 	// files
-	videoUrl = 'https://s3.eu-central-1.amazonaws.com/flipbase-coding-challenge/elysium.mkv',
+	videoUrl = process.argv[2],
 	downloadFile = 'video.mkv',
 	newFile = require('./routes/download-and-encode').newFile,
 
